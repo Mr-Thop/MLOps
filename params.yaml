@@ -1,0 +1,37 @@
+data_collection:
+  dataset_name: cifar10
+  raw_data_dir: data/raw
+  seed: 42
+
+data_processing:
+  image_size: 32
+  normalize: true
+  validation_split: 0.15
+  test_split: 0.15
+  augmentation:
+    rotation_range: 15
+    horizontal_flip: true
+    zoom_range: 0.1
+  processed_data_dir: data/processed
+
+feature_selection:
+  method: pca
+  pca_n_components: 100
+  variance_threshold: 0.01
+  features_dir: data/features
+
+model_training:
+  model_type: mlp
+  hidden_units: [256,128]
+  dropout_rate: 0.3
+  activation: relu
+  optimizer: adam
+  learning_rate: 0.001
+  batch_size: 64
+  epochs: 10
+  model_dir: models
+
+model_evaluation:
+  metrics: [accuracy, precision, recall, f1_score]
+  metrics_file: metrics/evaluation.json
+  reports_dir: reports

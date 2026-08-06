@@ -1,0 +1,72 @@
+stages:
+  data_collection:
+    cmd: python src/data_collection.py
+    deps:
+      - src/data_collection.py
+    params:
+      - data_collection.dataset_name
+      - data_collection.raw_data_dir
+      - data_collection.seed
+    outs:
+      - data/raw
+  
+  data_processing:
+    cmd: python src/data_processing.py
+    deps:
+      - src/data_processing.py
+      - data/raw
+    params:
+      - data_processing.image_size
+      - data_processing.normalize
+      - data_processing.validation_split
+      - data_processing.test_split
+      - data_processing.augmentation
+      - data_processing.processed_data_dir
+    outs:
+      - data/processed
+  
+  feature_selection:
+    cmd: python src/feature_selection.py
+    deps:
+      - src/feature_selection.py
+      - data/processed
+    params:
+      - feature_selection.method
+      - feature_selection.pca_n_components
+      - feature_selection.variance_threshold
+      - feature_selection.features_dir
+    outs:
+      - data/features
+  
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+      - src/model_training.py
+      - data/features
+    params:
+      - model_training.model_type
+      - model_training.hidden_units
+      - model_training.dropout_rate
+      - model_training.activation
+      - model_training.optimizer
+      - model_training.learning_rate
+      - model_training.batch_size
+      - model_training.epochs
+    outs:
+      - models
+  
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+      - src/model_evaluation.py
+      - models
+      - data/features
+      - data/processed
+    params:
+      - model_evaluation.metrics
+    metrics:
+      - metrics/evaluation.json:
+        cache: false
+    outs:
+      - reports
+      
