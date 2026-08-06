@@ -1,0 +1,142 @@
+schema: '2.0'
+stages:
+  data_collection:
+    cmd: python src/data_collection.py
+    deps:
+    - path: src/data_collection.py
+      hash: md5
+      md5: 64404e8a8e4fe2e14524af4bee02a596
+      size: 1790
+    params:
+      params.yaml:
+        data_collection.dataset_name: cifar10
+        data_collection.raw_data_dir: data/raw
+        data_collection.seed: 42
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: fd70a72bb7afc8894d9568cb0266d847.dir
+      size: 184380256
+      nfiles: 2
+  data_processing:
+    cmd: python src/data_processing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: fd70a72bb7afc8894d9568cb0266d847.dir
+      size: 184380256
+      nfiles: 2
+    - path: src/data_processing.py
+      hash: md5
+      md5: fdb4209bd31fb221ecc502c900121845
+      size: 2620
+    params:
+      params.yaml:
+        data_processing.augmentation:
+          rotation_range: 15
+          horizontal_flip: true
+          zoom_range: 0.1
+        data_processing.image_size: 32
+        data_processing.normalize: true
+        data_processing.processed_data_dir: data/processed
+        data_processing.test_split: 0.15
+        data_processing.validation_split: 0.15
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
+      size: 737340828
+      nfiles: 7
+  feature_selection:
+    cmd: python src/feature_selection.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
+      size: 737340828
+      nfiles: 7
+    - path: src/feature_selection.py
+      hash: md5
+      md5: 4c4366c2f8eed96b3351358f9dfb9880
+      size: 2735
+    params:
+      params.yaml:
+        feature_selection.features_dir: data/features
+        feature_selection.method: pca
+        feature_selection.pca_n_components: 100
+        feature_selection.variance_threshold: 0.01
+    outs:
+    - path: data/features
+      hash: md5
+      md5: bb19e608480c6f9caff2cecb25a559e1.dir
+      size: 24000476
+      nfiles: 4
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: bb19e608480c6f9caff2cecb25a559e1.dir
+      size: 24000476
+      nfiles: 4
+    - path: src/model_training.py
+      hash: md5
+      md5: beff89d949cec57805df4967ad90c74c
+      size: 2711
+    params:
+      params.yaml:
+        model_training.activation: relu
+        model_training.batch_size: 64
+        model_training.dropout_rate: 0.3
+        model_training.epochs: 10
+        model_training.hidden_units:
+        - 256
+        - 128
+        model_training.learning_rate: 0.001
+        model_training.model_type: mlp
+        model_training.optimizer: adam
+    outs:
+    - path: models
+      hash: md5
+      md5: e8c886f68f4c49493c0dba4fefc72443.dir
+      size: 751351
+      nfiles: 2
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: bb19e608480c6f9caff2cecb25a559e1.dir
+      size: 24000476
+      nfiles: 4
+    - path: data/processed
+      hash: md5
+      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
+      size: 737340828
+      nfiles: 7
+    - path: models
+      hash: md5
+      md5: e8c886f68f4c49493c0dba4fefc72443.dir
+      size: 751351
+      nfiles: 2
+    - path: src/model_evaluation.py
+      hash: md5
+      md5: 29319c5c1c680177fe6a996ac9e5b960
+      size: 2594
+    params:
+      params.yaml:
+        model_evaluation.metrics:
+        - accuracy
+        - precision
+        - recall
+        - f1_score
+    outs:
+    - path: metrics/evaluation.json
+      hash: md5
+      md5: a50f465c4af07c257eae4fbda3de5c60
+      size: 142
+    - path: reports
+      hash: md5
+      md5: 4b015127918ebace79de875c3d69cb93.dir
+      size: 16039
+      nfiles: 1
