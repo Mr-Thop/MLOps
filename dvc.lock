@@ -9,22 +9,22 @@ stages:
       size: 1790
     params:
       params.yaml:
-        data_collection.dataset_name: cifar10
+        data_collection.dataset_name: mnist
         data_collection.raw_data_dir: data/raw
         data_collection.seed: 42
     outs:
     - path: data/raw
       hash: md5
-      md5: fd70a72bb7afc8894d9568cb0266d847.dir
-      size: 184380256
+      md5: e4503899fb71206dba1a4ca2c11ac9f4.dir
+      size: 54950256
       nfiles: 2
   data_processing:
     cmd: python src/data_processing.py
     deps:
     - path: data/raw
       hash: md5
-      md5: fd70a72bb7afc8894d9568cb0266d847.dir
-      size: 184380256
+      md5: e4503899fb71206dba1a4ca2c11ac9f4.dir
+      size: 54950256
       nfiles: 2
     - path: src/data_processing.py
       hash: md5
@@ -44,16 +44,16 @@ stages:
     outs:
     - path: data/processed
       hash: md5
-      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
-      size: 737340828
+      md5: 244b4bb684073b3c8b00985fe112972e.dir
+      size: 286790828
       nfiles: 7
   feature_selection:
     cmd: python src/feature_selection.py
     deps:
     - path: data/processed
       hash: md5
-      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
-      size: 737340828
+      md5: 244b4bb684073b3c8b00985fe112972e.dir
+      size: 286790828
       nfiles: 7
     - path: src/feature_selection.py
       hash: md5
@@ -63,21 +63,21 @@ stages:
       params.yaml:
         feature_selection.features_dir: data/features
         feature_selection.method: pca
-        feature_selection.pca_n_components: 100
+        feature_selection.pca_n_components: 200
         feature_selection.variance_threshold: 0.01
     outs:
     - path: data/features
       hash: md5
-      md5: bb19e608480c6f9caff2cecb25a559e1.dir
-      size: 24000476
+      md5: bab368933b32ac3f2a6fdfd6dc709ab7.dir
+      size: 56000476
       nfiles: 4
   model_training:
     cmd: python src/model_training.py
     deps:
     - path: data/features
       hash: md5
-      md5: bb19e608480c6f9caff2cecb25a559e1.dir
-      size: 24000476
+      md5: bab368933b32ac3f2a6fdfd6dc709ab7.dir
+      size: 56000476
       nfiles: 4
     - path: src/model_training.py
       hash: md5
@@ -86,38 +86,38 @@ stages:
     params:
       params.yaml:
         model_training.activation: relu
-        model_training.batch_size: 64
-        model_training.dropout_rate: 0.3
-        model_training.epochs: 10
+        model_training.batch_size: 128
+        model_training.dropout_rate: 0.4
+        model_training.epochs: 40
         model_training.hidden_units:
+        - 512
         - 256
-        - 128
-        model_training.learning_rate: 0.001
+        model_training.learning_rate: 0.0005
         model_training.model_type: mlp
-        model_training.optimizer: adam
+        model_training.optimizer: rmsprop
     outs:
     - path: models
       hash: md5
-      md5: e8c886f68f4c49493c0dba4fefc72443.dir
-      size: 751351
+      md5: 38a173e34b1100d1675f1f44b8042220.dir
+      size: 1926287
       nfiles: 2
   model_evaluation:
     cmd: python src/model_evaluation.py
     deps:
     - path: data/features
       hash: md5
-      md5: bb19e608480c6f9caff2cecb25a559e1.dir
-      size: 24000476
+      md5: bab368933b32ac3f2a6fdfd6dc709ab7.dir
+      size: 56000476
       nfiles: 4
     - path: data/processed
       hash: md5
-      md5: be6f2803bf3fde45d98a7de9c29648fd.dir
-      size: 737340828
+      md5: 244b4bb684073b3c8b00985fe112972e.dir
+      size: 286790828
       nfiles: 7
     - path: models
       hash: md5
-      md5: e8c886f68f4c49493c0dba4fefc72443.dir
-      size: 751351
+      md5: 38a173e34b1100d1675f1f44b8042220.dir
+      size: 1926287
       nfiles: 2
     - path: src/model_evaluation.py
       hash: md5
@@ -133,10 +133,10 @@ stages:
     outs:
     - path: metrics/evaluation.json
       hash: md5
-      md5: a50f465c4af07c257eae4fbda3de5c60
-      size: 142
+      md5: 2ad2f8567699f4af476578fd1d21b846
+      size: 141
     - path: reports
       hash: md5
-      md5: 4b015127918ebace79de875c3d69cb93.dir
-      size: 16039
+      md5: 1044b4e641f84baa69806cbc756a4a4d.dir
+      size: 15507
       nfiles: 1
